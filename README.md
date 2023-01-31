@@ -1,0 +1,2 @@
+# AliyunPlayScript
+在阿里云网页版通过获取直链调用potplayer等播放器播放原画视频
