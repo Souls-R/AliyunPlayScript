@@ -1,10 +1,14 @@
 # AliyunPlayScript
 在阿里云网页版通过获取直链调用potplayer等播放器播放原画视频，使用用户脚本管理器安装该脚本。
 
-# 播放暂不可用
-## 坏
+# 修好了
 
-由于官方API更新，原画播放暂不可用，分享链接下载功能可用。
+~~由于官方API更新，原画播放暂不可用，分享链接下载功能可用。~~
+
+参考
+`https://www.52pojie.cn/thread-1745677-1-1.html`
+`https://github.com/kazutoiris/ali_ecc`
+添加sign算法
 
 # 使用
 苦于alist不够好用，emby过于笨重，为简化观影步骤，该脚本在阿里云网页版视频预览界面添加原画播放按钮，点击后调用potplayer等播放器播放原画视频。
