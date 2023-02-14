@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name              阿里云原画播放
-// @version           1.0.1
-// @author            GreasyFork
+// @version           1.1.1
+// @author            Author Moe
 // @date              2023-02-14
 // @description       在画质选项中加入原画播放选项，使用potplayer播放阿里云盘原画视频（需要安装potplayer插件）
 // @license           AGPL-3.0-or-later
-// @antifeature       membership
 // @match             *://www.aliyundrive.com/s/*
 // @match             *://www.aliyundrive.com/drive*
 // @require           https://unpkg.com/jquery@3.6.0/dist/jquery.min.js
@@ -25,6 +24,7 @@
 // @grant             GM_registerMenuCommand
 // @grant             GM_cookie
 // @icon              https://gw.alicdn.com/imgextra/i3/O1CN01aj9rdD1GS0E8io11t_!!6000000000620-73-tps-16-16.ico
+// @namespace https://greasyfork.org/users/1026976
 // ==/UserScript==
 
 (function () {
@@ -180,7 +180,7 @@
                     }
                     //console.log("got:", url, g_drive_id, g_file_id, g_file_name);
 
-                    //循环检测dom创建，添加按钮 
+                    //循环检测dom创建，添加按钮
                     let ins = setInterval(() => {
                         let quality = document.getElementsByClassName("drawer-list--JYzyI");
                         if (quality.length > 0) {
@@ -219,7 +219,7 @@
                     }, 50);
 
                 }
-                
+
                 send.apply(this, arguments);
             };
         }
