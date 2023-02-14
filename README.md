@@ -1,5 +1,6 @@
 # AliyunPlayScript
 在阿里云网页版通过获取直链调用potplayer等播放器播放原画视频，使用用户脚本管理器安装该脚本。
+已发布[greasyfork](https://greasyfork.org/zh-CN/scripts/460014-%E9%98%BF%E9%87%8C%E4%BA%91%E5%8E%9F%E7%94%BB%E6%92%AD%E6%94%BE)。
 
 # 修好了
 
