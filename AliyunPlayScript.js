@@ -1,14 +1,16 @@
 // ==UserScript==
 // @name              阿里云原画播放
-// @version           1.0.0
+// @version           1.0.1
 // @author            GreasyFork
-// @date              2023-01-31
+// @date              2023-02-14
 // @description       在画质选项中加入原画播放选项，使用potplayer播放阿里云盘原画视频（需要安装potplayer插件）
 // @license           AGPL-3.0-or-later
 // @antifeature       membership
 // @match             *://www.aliyundrive.com/s/*
 // @match             *://www.aliyundrive.com/drive*
 // @require           https://unpkg.com/jquery@3.6.0/dist/jquery.min.js
+// @require           https://unpkg.com/bn.js@4.11.8/lib/bn.js
+// @require           https://unpkg.com/@lionello/secp256k1-js@1.1.0/src/secp256k1.js
 // @connect           aliyundrive.com
 // @connect           localhost
 // @connect           *
@@ -28,6 +30,10 @@
 (function () {
     'use strict';
     let g_drive_id = "", g_file_id = "", g_file_name = "", g_share_id = "";
+    let privateKey = "", publicKey = "";
+    let app_id = "", device_id = "",user_id = "";
+    let signature = "";
+    let headers={};
     let api_url = {
             "0": "https://api.aliyundrive.com/v2/file/get_share_link_download_url",
             "1": "https://api.aliyundrive.com/v2/file/get_download_url"
@@ -67,14 +73,10 @@
         },
 
         async getRealLink(d, f) {
-            let authorization = `${this.getStorage('token').token_type} ${this.getStorage('token').access_token}`;
             let res = await this.post(api_url[1], {
                 drive_id: d,
                 file_id: f
-            }, {
-                authorization,
-                "content-type": "application/json;charset=utf-8",
-            });
+            }, headers);
             //console.log("getRealLink", d,f,res);
             if (res.url) {
                 return res.url;
@@ -115,8 +117,49 @@
             });
         },
 
+        async initECDSAKey() {
+            let privateKeyBuf = window.crypto.getRandomValues(new Uint8Array(32));
+            privateKey = Secp256k1.uint256(privateKeyBuf, 16);
+            publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
+            publicKey = "04" + publicKey.x + publicKey.y;
+            app_id = "5dde4e1bdf9e4966b387ba58f4b3fdc3";
+            device_id = this.getStorage('cna');
+            user_id = this.getStorage('token').user_id;
+            console.log("initECDSAKey",privateKeyBuf);
+            let nonce = 0;
+            //sign
+            let text = `${app_id}:${device_id}:${user_id}:${nonce}`;
+            let encoder = new TextEncoder();
+            let data = encoder.encode(text);
+            let hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            //hashBuffer to uint8 array
+            hashBuffer = new Uint8Array(hashBuffer);
+            console.log("hashBuffer",hashBuffer);
+            let sig = Secp256k1.ecsign(privateKey, Secp256k1.uint256(hashBuffer, 16));
+            signature = sig.r + sig.s + "01";
+            headers = {
+                "content-type": "application/json;charset=utf-8",
+                "authorization": `${this.getStorage('token').token_type} ${this.getStorage('token').access_token}`,
+                "origin": "https://www.aliyundrive.com",
+                "referer": "https://www.aliyundrive.com/",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.41",
+                "x-canary": "client=web,app=adrive,version=v3.17.0",
+                "x-device-id": device_id,
+                "x-signature": signature,
+            }
+            //create session
+            const req = await fetch('https://api.aliyundrive.com/users/v1/users/device/create_session', {
+                method: 'POST',
+                body: JSON.stringify({ "deviceName": "Edge浏览器", "modelName": "Windows网页版", "pubKey": publicKey }),
+                headers: headers
+            });
+            const res = await req.json();
+            console.log("create session",res);
+        },
+
         init() {
             main.initDefaultConfig();
+            main.initECDSAKey();
             //识别页面类型
             let sharepage=window.location.href.indexOf("s/")>0;
             //劫持XMLHttpRequest
