@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name              阿里云原画播放
-// @version           1.1.1
+// @version           1.1.2
 // @author            Author Moe
 // @date              2023-02-14
-// @description       在画质选项中加入原画播放选项，使用potplayer播放阿里云盘原画视频（需要安装potplayer插件）
+// @description       在画质选项中加入原画播放选项，使用potplayer播放阿里云盘原画视频（需要安装potplayer插件）https://github.com/gene9831/AliyunDrivePotPlayer
 // @license           AGPL-3.0-or-later
 // @match             *://www.aliyundrive.com/s/*
 // @match             *://www.aliyundrive.com/drive*
@@ -123,7 +123,7 @@
             publicKey = Secp256k1.generatePublicKeyFromPrivateKeyData(privateKey);
             publicKey = "04" + publicKey.x + publicKey.y;
             app_id = "5dde4e1bdf9e4966b387ba58f4b3fdc3";
-            device_id = this.getStorage('cna');
+            device_id = this.getStorage('token').device_id;
             user_id = this.getStorage('token').user_id;
             console.log("initECDSAKey",privateKeyBuf);
             let nonce = 0;
